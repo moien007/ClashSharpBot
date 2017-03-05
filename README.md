@@ -1,10 +1,10 @@
 # ClashSharpBot
-Clash of Clans Bot Written In C#.Net, This project is not completed and don't wait for updates. I'm no have time to complete this. Your free to continue this project without any credits to me if required.
+C#B is open-source clash of clans bot that manage your village and attack like human.
 
-Enjoy
-
+## Can i use it ?
+No. this project is not completed. im trying to complete this project. i hope it done.
 
 ### Used Libraries :
-* Tesseract OCR
+* Tesseract OCR (Big thanks for this free and open source library developers)
 * Accord.Net
-* Autoit3 (sorry for...)
+* Autoit3 (no install needed)
