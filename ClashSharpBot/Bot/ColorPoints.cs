@@ -9,7 +9,7 @@
 using System;
 using System.Drawing;
 
-using ClashSharpBot.Bot.CoC;
+using ClashSharpBot.Bot.Logic;
 
 namespace ClashSharpBot.Bot
 {

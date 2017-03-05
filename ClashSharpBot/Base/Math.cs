@@ -6,31 +6,34 @@
  */
 
 using System;
-using System.Text.RegularExpressions;
 
 namespace ClashSharpBot.Base
 {
     class BasicMath
     {
-        private static readonly Regex rxNonDigits = new Regex(@"[^\d]+");
-
         // functions to get random number (http://stackoverflow.com/questions/2706500/how-do-i-generate-a-random-int-number-in-c)
         private static readonly Random getrandom = new Random();
         private static readonly object syncLock = new object();
 
         public static int CleanStringOfNonDigits(string s)
-        {                                               
-            try
+        {
+            string cleaned = string.Empty;
+
+            foreach(char c in s)
             {
-                if (string.IsNullOrEmpty(s)) return 0;
-                else if (s == "None") return 0;
-                string cleaned = rxNonDigits.Replace(s, "");
-                return int.Parse(cleaned);
+                if (!char.IsNumber(c)) continue;
+
+                cleaned += c;
             }
-            catch (Exception)
+
+            int i;
+
+            if(!int.TryParse(cleaned,  out i))
             {
                 return 0;
             }
+
+            return i;
         }
 
      

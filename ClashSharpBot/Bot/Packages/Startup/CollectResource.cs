@@ -14,11 +14,19 @@ using System.Threading.Tasks;
 
 namespace ClashSharpBot.Bot.Packages.Startup
 {
-    class CollectResource
+    public class CollectResource : IPackage
     {
-        public static void Execute()
+        public string PackageName
         {
-            // TODO
+            get
+            {
+                return "Collect Resource";
+            }
+        }
+
+        public void Execute()
+        {
+            // TODO : Implement gold, elixir, dark elixir image for clicking
             Bitmap Gold = null; // Gold Image
             Bitmap Elixir = null; // Elixir Image
             Bitmap DarkElixir = null; // DE Image
@@ -43,6 +51,11 @@ namespace ClashSharpBot.Bot.Packages.Startup
             // And Click The Points One by One
             foreach (Point point in CollectIcons)
                 BlueStacks.MouseClick(point);
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }

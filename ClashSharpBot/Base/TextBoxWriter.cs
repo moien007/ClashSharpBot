@@ -1,8 +1,8 @@
 ﻿/*
  * Clash Sharp Bot Base
  * 
- * Source From : http://stackoverflow.com/questions/14802876/what-is-a-good-way-to-direct-console-output-to-text-box-in-windows-form
- * Desc : TextBoWriter enable to redirect console output to text box 
+ * Author : Moien007
+ * Desc : We use this to redirect console output to control like textbox
  */
 
 using System;
@@ -12,24 +12,28 @@ using System.Windows.Forms;
 
 namespace ClashSharpBot.Base
 {
-    public class TextBoxWriter : TextWriter
+    public class ControlWriter : TextWriter
     {
-        TextBox _output = null;
+        public Control Control { get; set; }
 
-        public TextBoxWriter(TextBox output)
+        public ControlWriter(Control control)
         {
-            _output = output;
+            Control = control;
         }
 
         public override void Write(char value)
         {
-            base.Write(value);
-            _output.AppendText(value.ToString());
+            Control.Text += value;
+        }
+
+        public override void Write(string value)
+        {
+            Control.Text += value;
         }
 
         public override Encoding Encoding
         {
-            get { return null; /*System.Text.Encoding.UTF8;*/ }   //  Null for Write Any Char
+            get { return Encoding.UTF8; }
         }
     }
 }

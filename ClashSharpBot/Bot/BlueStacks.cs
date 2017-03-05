@@ -14,10 +14,13 @@ using System.Runtime.InteropServices;
 
 using ClashSharpBot.Base;
 
+// TODO : Log bluestacks
+
 namespace ClashSharpBot.Bot
 {
     class BlueStacks
     {
+        static ILogger Logger = Log.GetLogger("BlueStacks");
 
         public static Process Process  = null;
         public static IntPtr ProcessHandle = IntPtr.Zero;
@@ -33,17 +36,17 @@ namespace ClashSharpBot.Bot
             
 
             // Find BlueStacks Window Handle
-            ProcessHandle = WinAPI.FindWindow(null, "BlueStacks App Player");
+            ProcessHandle = Win32.FindWindow(null, "BlueStacks App Player");
 
             if (ProcessHandle != IntPtr.Zero)
             {
                 // Find BlueStacks Class Handle
-                ClassHandle = WinAPI.FindWindowEx(ProcessHandle, IntPtr.Zero, "BlueStacksApp", null);
+                ClassHandle = Win32.FindWindowEx(ProcessHandle, IntPtr.Zero, "BlueStacksApp", null);
 
                 uint ProcessID;
 
                 // Find BlueStacks Process By Handle
-                WinAPI.GetWindowThreadProcessId(ProcessHandle, out ProcessID);
+                Win32.GetWindowThreadProcessId(ProcessHandle, out ProcessID);
 
                 Process = Process.GetProcessById(Convert.ToInt32(ProcessID));
                 return true;       
@@ -62,9 +65,9 @@ namespace ClashSharpBot.Bot
         {
             Rectangle rectangle = new Rectangle();
 
-            WinAPI.RECT rect;
+            Win32.RECT rect;
 
-            if(!WinAPI.GetWindowRect(new HandleRef(ProcessHandle, ClassHandle), out rect))
+            if(!Win32.GetWindowRect(new HandleRef(ProcessHandle, ClassHandle), out rect))
             {
                 rectangle.X = rect.Left;
                 rectangle.Y = rect.Top;
@@ -110,6 +113,7 @@ namespace ClashSharpBot.Bot
         /// </summary>
         public static bool MouseClick(string Button = "LEFT", int nX = -2147483647, int nY = -2147483647, int nClicks = 1, int nSpeed = -1)
         {
+            Logger.Debug("Sending mouse click to {0},{1}", nX, nY);
             Point pos = GetRectangle().Location;
             return AutoIt3Wrapper.MouseClick(Button, pos.X + nX, pos.Y + nX, nClicks, nClicks) == 1;
         }
@@ -196,6 +200,7 @@ namespace ClashSharpBot.Bot
         /// </summary>
         public static bool SetPosition(int x, int y)
         {
+            Logger.Info("Set bluestacks position to {0},{1}", x, y);
             return AutoIt3Wrapper.WinMove(Process.MainWindowTitle, "", x, y) == 1;
         }
 
@@ -210,7 +215,7 @@ namespace ClashSharpBot.Bot
              * This Code's Is From a Sample, But Im Do Some Fix's
              */
 
-            Bitmap BigImage = ClashSharpBot.Base.Imaging.ConvertPixelFormat(bitmap, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            Bitmap BigImage = ClashSharpBot.Base.ImageUtils.ConvertPixelFormat(bitmap, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
 
             // create template matching algorithm's instance
             Accord.Imaging.ExhaustiveTemplateMatching tm = new Accord.Imaging.ExhaustiveTemplateMatching(Similarity);

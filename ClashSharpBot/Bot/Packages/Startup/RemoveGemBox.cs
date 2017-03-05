@@ -13,10 +13,24 @@ using System.Drawing;
 
 namespace ClashSharpBot.Bot.Packages.Startup
 {
-    class RemoveGemBox
+    class RemoveGemBox : IPackage
     {
-        public static void Execute()
+        public string PackageName
         {
+            get
+            {
+                return "Remove Gem Box";
+            }
+        }
+
+        public void Dispose()
+        {
+
+        }
+
+        public void Execute()
+        {
+            // TODO : Implement GemBox image
             Bitmap GemBox = null; // Gembox Image
 
             List<Point> GemBoxs = BlueStacks.TemplateMatch(GemBox, 0.982f);

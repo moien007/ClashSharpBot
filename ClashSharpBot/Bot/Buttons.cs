@@ -5,7 +5,7 @@
  * Desc : Game Buttons By Image's or Rectangle
  */
 
-using ClashSharpBot.Bot.CoC.Objects;
+using ClashSharpBot.Bot.Logic;
 using System.Drawing;
 
 namespace ClashSharpBot.Bot

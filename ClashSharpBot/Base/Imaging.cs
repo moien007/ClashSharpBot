@@ -1,6 +1,8 @@
 ﻿/* Clash Sharp Bot Base
  * 
- * Author : Moien007 and Some Site's I Can't Remeber
+ * Author : Moien007 
+ * Desc : Utils for System.Drawing.Image (actually for bitmap)
+ * Note : I got this codes from some site's but i can't remember sorry
  */
 
 using System;
@@ -11,7 +13,7 @@ using System.Drawing.Drawing2D;
 
 namespace ClashSharpBot.Base
 {
-    class Imaging
+    class ImageUtils
     {
         public static Bitmap ResizeImage(Image image, int width, int height)
         {

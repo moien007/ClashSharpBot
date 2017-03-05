@@ -2,14 +2,14 @@
  * Clash Sharp Bot
  * 
  * Author : Moien007
- * Desc : Windows API Invoke
+ * Desc : Platform invoke
  */
 
 using System;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
-
-class Win32
+internal class Win32
 {
     [DllImport("user32.dll", SetLastError = true)]
     public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -40,4 +40,3 @@ class Win32
         public int Bottom;      // y position of lower-right corner
     }
 }
-

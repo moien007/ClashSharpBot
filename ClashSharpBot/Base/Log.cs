@@ -1,78 +1,84 @@
-﻿using System;
+﻿/*
+ * Portable Logging Class
+ * 
+ * Author : Moien007
+ * Last Update : 2/16/2017
+ */
+
+using System;
 using System.Text;
 using System.IO;
 
-public class Log
+public static class Log
 {
-    public static string File { get; set; }
+    public static string LogFile { get; set; }
 
-    public static LogLevel Level { get; set; }
+    public const LogLevel AllLogLevels = LogLevel.Warn | LogLevel.Info | LogLevel.Error | LogLevel.Debug;
+
+    public static LogLevel Level { get; set; } = AllLogLevels;
 
     public static string DatetimeFormat;
 
-    public static bool ShowDebugs = false;
+    private static object syncObject = new object();
 
-    static object sync = new object();
+    private static StringBuilder logBuilder = new StringBuilder();
 
-    public static void Init()
+    static Log()
     {
-        // No Write Log to File
-        File = string.Empty;
-
-        // Basic Log Levels
-        Level = LogLevel.Info | LogLevel.Error;
+        LogFile = string.Empty;
+        Level = LogLevel.None;
 
         // Set Default DateTime Format 
         ResetDatetimeFormat();
     }
 
-    public static void Init(string file)
+    public static void Init()
     {
-        File = file;
+        // No Write Log to File
+        LogFile = string.Empty;
 
         // Basic Log Levels
         Level = LogLevel.Info | LogLevel.Error;
+    }
 
-        // Set Default DateTime Format 
-        ResetDatetimeFormat();
+    public static void Init(string file)
+    {
+        LogFile = file;
+
+        // Basic Log Levels
+        Level = LogLevel.Info | LogLevel.Error;
     }
 
     public static void Init(LogLevel level)
     {
         // No Write Log to File
-        File = string.Empty;
+        LogFile = string.Empty;
 
         Level = level;
-
-        // Set Default DateTime Format 
-        ResetDatetimeFormat();
     }
 
     public static void Init(string file, LogLevel level)
     {
-        File = file;
+        LogFile = file;
         Level = level;
 
         // Set Default DateTime Format 
         ResetDatetimeFormat();
     }
 
-    private static bool MayWriteType(LogLevel type)
+    static bool MayWriteType(LogLevel type)
     {
+        if (type == LogLevel.None) return false;
         return ((Level & type) == type);
     }
 
     public static void ResetDatetimeFormat()
     {
-        DatetimeFormat = "";
+        DatetimeFormat = "HH:mm:ss";
     }
 
-    public static void Write(object Text, LogLevel loglevel)
+    public static void Write(object Text, LogLevel loglevel, string prefix = "")
     {
-        // we accecpt text as object like consosle
-        // because user no need to write .ToString
-
-        // we convert object to string
         string text = Text.ToString();
 
         // date time
@@ -82,12 +88,20 @@ public class Log
         string loglevelStr = loglevel.ToString();
 
         // lock a object to have clean text on mutlithreaded app's
-        lock (sync)
+        lock (syncObject)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
 
             // Write Date Time 
-            Console.Write("[{0}] ", datetime);
+            Console.Write("[{0}]", datetime);
+
+            Console.ForegroundColor = ConsoleColor.DarkCyan;
+
+            if (!string.IsNullOrEmpty(prefix))
+            {
+                // write prefix if it's not empty or null
+                Console.Write("[{0}]", prefix);
+            }
 
             switch (loglevel)
             {
@@ -106,63 +120,152 @@ public class Log
             }
 
             // Write Log Level
-            Console.Write("{0} :: ", loglevelStr);
+            Console.Write(" {0}: ", loglevelStr);
 
             Console.ForegroundColor = ConsoleColor.Gray;
 
             Console.WriteLine(text);
-        }
 
-        if (File == string.Empty)
-            return;
+            if (string.IsNullOrEmpty(LogFile))
+                return;
 
-        // Write Log to File
-        using (FileStream logfile = System.IO.File.OpenWrite(File)) // Open File With Write Access
-        using (StreamWriter writer = new StreamWriter(logfile)) // Create Stream Writer
-        {
-            writer.WriteLine("[{0}] {1} : {2}", datetime, loglevelStr, text);
+            logBuilder.AppendFormat("[{0}]{4} {1} : {2}{3}", datetime, loglevelStr, text, Environment.NewLine,
+                string.IsNullOrEmpty(prefix) ? string.Empty : string.Format("[{0}]", prefix)); // write prefix if it's not null or empty
         }
     }
 
-    public static void Info(object text)
+    public static void WriteLogFile()
+    {
+        string logs = logBuilder.ToString();
+        logBuilder.Clear();
+
+        File.AppendAllText(LogFile, logs);
+    }
+
+    public static void Info(string format, params object[] args)
     {
         if (!MayWriteType(LogLevel.Info))
         {
             return;
         }
 
-        Write(text, LogLevel.Info);
+        Write(string.Format(format, args), LogLevel.Info);
     }
 
-    public static void Warn(object text)
+    public static void Warn(string format, params object[] args)
     {
         if (!MayWriteType(LogLevel.Warn))
         {
             return;
         }
 
-        Write(text, LogLevel.Warn);
+        Write(string.Format(format, args), LogLevel.Warn);
     }
 
-    public static void Error(object text)
+    public static void Error(string format, params object[] args)
     {
         if (!MayWriteType(LogLevel.Error))
         {
             return;
         }
 
-        Write(text, LogLevel.Error);
+        Write(string.Format(format, args), LogLevel.Error);
     }
 
-    public static void Debug(object text)
+    public static void Debug(string format, params object[] args)
     {
-        if(!MayWriteType(LogLevel.Debug))
+        if (!MayWriteType(LogLevel.Debug))
         {
             return;
         }
 
-        Write(text, LogLevel.Debug);
+        Write(string.Format(format, args), LogLevel.Debug);
     }
+    
+    public static ILogger GetLogger(string name)
+    {
+        // Create a logger with this logger levels
+        return new Logger(name, Level);
+    }
+
+    public static ILogger GetLogger(string name, LogLevel levels)
+    {
+        return new Logger(name, levels);
+    }
+
+    private class Logger : ILogger
+    {
+        public LogLevel Levels { get; set; }
+        public string Prefix { get; set; }
+
+        public Logger(string prefix, LogLevel level)
+        {
+            Prefix = prefix;
+            Levels = level;
+        }
+
+        private bool MayWriteType(LogLevel type)
+        {
+            if (type == LogLevel.None) return false;
+            return ((Levels & type) == type);
+        }
+
+        public void Info(string format, params object[] args)
+        {
+            if (!MayWriteType(LogLevel.Info))
+            {
+                return;
+            }
+
+            Write(string.Format(format, args), LogLevel.Info);
+        }
+
+        public void Warn(string format, params object[] args)
+        {
+            if (!MayWriteType(LogLevel.Warn))
+            {
+                return;
+            }
+
+            Write(string.Format(format, args), LogLevel.Warn);
+        }
+
+        public void Error(string format, params object[] args)
+        {
+            if (!MayWriteType(LogLevel.Error))
+            {
+                return;
+            }
+            
+            Write(string.Format(format, args), LogLevel.Error);
+        }
+
+        public void Debug(string format, params object[] args)
+        {
+            if (!MayWriteType(LogLevel.Debug))
+            {
+                return;
+            }
+
+            Write(string.Format(format, args), LogLevel.Debug);
+        }
+
+        public void Write(object obj, LogLevel level)
+        {
+            Log.Write(obj, level, Prefix);
+        }
+    }
+}
+
+public interface ILogger
+{
+    string Prefix { get; set; }
+    LogLevel Levels { get; set; }
+    void Write(object obj, LogLevel level);
+    void Info(string format, params object[] args);
+    void Debug(string format, params object[] args);
+    void Warn(string format, params object[] args);
+    void Error(string format, params object[] args);
 }
 
 public enum LogLevel
@@ -171,5 +274,5 @@ public enum LogLevel
     Debug,
     Error,
     Warn,
-    None
+    None,
 }

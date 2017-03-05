@@ -2,7 +2,7 @@
  * Clash Sharp Bot Base
  * 
  * Author : Moien007
- * Desc : 
+ * Desc : Utils for System.Drawing.Point
  */ 
 
 using System.Drawing;
@@ -12,7 +12,7 @@ using ClashSharpBot.Base;
 
 namespace ClashSharpBot 
 {
-    class EasyPoint
+    class PointUtils
     {
         public static Point RandomPoint(Point a, Point b) // Anti-Ban is HERE :)
         {
