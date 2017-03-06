@@ -2,19 +2,18 @@
  * Clash Sharp Bot Project
  * 
  * Author : Moien007
- * Desc : BlueStacks Automation Tools
+ * Desc : BlueStacks Automation 
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
-
 using ClashSharpBot.Base;
 
-// TODO : Log bluestacks
 
 namespace ClashSharpBot.Bot
 {
@@ -23,8 +22,19 @@ namespace ClashSharpBot.Bot
         static ILogger Logger = Log.GetLogger("BlueStacks");
 
         public static Process Process  = null;
-        public static IntPtr ProcessHandle = IntPtr.Zero;
+        public static IntPtr WindowHandle = IntPtr.Zero;
         public static IntPtr ClassHandle = IntPtr.Zero;
+
+        public static bool IsRunning
+        {
+            get
+            {
+                if (Process == null) return false;
+
+                Process.Refresh();
+                return !Process.HasExited;
+            }
+        }
 
         public static bool Init()
         {
@@ -36,56 +46,44 @@ namespace ClashSharpBot.Bot
             
 
             // Find BlueStacks Window Handle
-            ProcessHandle = Win32.FindWindow(null, "BlueStacks App Player");
+            WindowHandle = Win32.FindWindow(null, "BlueStacks App Player");
 
-            if (ProcessHandle != IntPtr.Zero)
-            {
-                // Find BlueStacks Class Handle
-                ClassHandle = Win32.FindWindowEx(ProcessHandle, IntPtr.Zero, "BlueStacksApp", null);
+            // if window does not exist
+            if (WindowHandle == IntPtr.Zero)
+                return false;
+            
+                // Find bluestacks window class handle
+                ClassHandle = Win32.FindWindowEx(WindowHandle, IntPtr.Zero, "BlueStacksApp", null);
 
                 uint ProcessID;
 
-                // Find BlueStacks Process By Handle
-                Win32.GetWindowThreadProcessId(ProcessHandle, out ProcessID);
+                // Find bluestacks process by it's handle
+                Win32.GetWindowThreadProcessId(WindowHandle, out ProcessID);
 
                 Process = Process.GetProcessById(Convert.ToInt32(ProcessID));
                 return true;       
-            }
-            else
-            {
-                return false;
-            }
         }
 
-        /// <summary>
-        /// Get Bluestacks Window Rectangle
-        /// </summary>
-        /// <returns></returns>
         public static Rectangle GetRectangle()
         {
             Rectangle rectangle = new Rectangle();
 
             Win32.RECT rect;
 
-            if(!Win32.GetWindowRect(new HandleRef(ProcessHandle, ClassHandle), out rect))
-            {
-                rectangle.X = rect.Left;
-                rectangle.Y = rect.Top;
-                rectangle.Width = rect.Right - rect.Left + 1;
-                rectangle.Height = rect.Bottom - rect.Top + 1;
-            }
-            else
+            if(!Win32.GetWindowRect(new HandleRef(WindowHandle, ClassHandle), out rect))
             {
                 rectangle = Rectangle.Empty;
+                return rectangle;
             }
+
+            rectangle.X = rect.Left;
+            rectangle.Y = rect.Top;
+            rectangle.Width = rect.Right - rect.Left + 1;
+            rectangle.Height = rect.Bottom - rect.Top + 1;
 
             return rectangle;
         }
 
-        /// <summary>
-        /// Get Screenshot of Bluestacks
-        /// </summary>
-        /// <returns></returns>
         public static Bitmap GetBitmap()
         {
             Rectangle rect = GetRectangle();
@@ -99,155 +97,94 @@ namespace ClashSharpBot.Bot
             return bmp;
         }
 
-        /// <summary>
-        /// Get Screenshot of Bluestacks
-        /// </summary>
-        /// <returns></returns>
         public static Bitmap GetBitmap(Rectangle rect)
         {
             return GetBitmap().Clone(rect, PixelFormat.Format24bppRgb);
         }
 
-        /// <summary>
-        /// Mouse Click
-        /// </summary>
         public static bool MouseClick(string Button = "LEFT", int nX = -2147483647, int nY = -2147483647, int nClicks = 1, int nSpeed = -1)
         {
-            Logger.Debug("Sending mouse click to {0},{1}", nX, nY);
+            Logger.Info("Sending mouse click to [{0},{1}]", nX, nY);
             Point pos = GetRectangle().Location;
-            return AutoIt3Wrapper.MouseClick(Button, pos.X + nX, pos.Y + nX, nClicks, nClicks) == 1;
+            return AutoIt3Wrapper.MouseClick(Button, pos.X + nX, pos.Y + nX, nClicks, nSpeed) == 1;
         }
 
-        /// <summary>
-        /// Mouse Click
-        /// </summary>
         public static bool MouseClick(Point pos, int nClick = 1, int nSpeed = -1, string Button = "LEFT")
         {
-            return AutoIt3Wrapper.MouseClick(Button, pos.X, pos.Y, nClick, nSpeed) == 1;
+            return MouseClick(Button, pos.X, pos.Y, nClick, nSpeed);
         }
 
-        /// <summary>
-        /// Mouse Click
-        /// </summary>
-        public static bool MouseClick(int X, int Y, int nClick = 1, int nSpeed = -1, string Button = "LEFT")
-        {
-            return AutoIt3Wrapper.MouseClick(Button, X, Y, nClick, nSpeed) == 1;
-        }
-
-
-        /// <summary>
-        /// Mouse Up
-        /// </summary>
-        /// <param name="Button"></param>
         public static bool MouseUp(string Button = "LEFT")
         {
+            Logger.Info("Mouse up");
             return AutoIt3Wrapper.MouseUp(Button) == 1;
         }
 
-        /// <summary>
-        /// Mouse Down
-        /// </summary>
         public static bool MouseDown(string Button = "LEFT")
         {
+            Logger.Info("Mouse down");
             return AutoIt3Wrapper.MouseDown(Button) == 1;
         }
-
-        /// <summary>
-        /// Mouse Drag
-        /// </summary>
-        public static bool MouseClickDrag(string Button, int nX1, int nY1, int nX2, int nY2, int nSpeed = -1)
+        
+        public static bool MouseDrag(int nX1, int nY1, int nX2, int nY2, int nSpeed = -1, string Button = "LEFT")
         {
+            Logger.Info("Dragging mouse from [{0},{1}] to [{2},{3}]", nX1, nY1, nX2, nY2);
             Point pos = GetRectangle().Location;
             return AutoIt3Wrapper.MouseClickDrag(Button, pos.X + nX1, pos.Y + nY1, pos.X + nX2, pos.Y + nY2, nSpeed) == 1;
         }
-
-        /// <summary>
-        /// Mouse Drag
-        /// </summary>
-        public static bool MouseClickDrag(Point source, Point destination, int nSpeed = -1)
+        
+        public static bool MouseDrag(Point source, Point destination, int nSpeed = -1, string Button = "LEFT")
         {
-            return MouseClickDrag("LEFT", source.X, source.Y, destination.X, destination.Y, nSpeed = -1);
+            return MouseDrag(source.X, source.Y, destination.X, destination.Y, nSpeed, Button);
         }
-
-        /// <summary>
-        /// Get Pixel
-        /// </summary>
+        
         public static Color GetPixelColor(int x, int y)
         {
             Point pos = GetRectangle().Location;
             return Color.FromArgb(AutoIt3Wrapper.PixelGetColor(pos.X + x, pos.Y + y));
         }
-
-        /// <summary>
-        /// Get Pixel
-        /// </summary>
+        
         public static Color GetPixelColor(Point point)
         {
-            Point pos = GetRectangle().Location;
-            return Color.FromArgb(AutoIt3Wrapper.PixelGetColor(pos.X + point.X, pos.Y + point.Y));
+            return GetPixelColor(point.X, point.Y);
         }
-
-        /// <summary>
-        /// Send Text or Key
-        /// </summary>
+        
         public static bool Send(string strText, int nMode = 0)
         {
+            Logger.Debug("Sending \"{0}\"");
             return AutoIt3Wrapper.ControlSend(Process.MainWindowTitle, "", "", strText, nMode) == 1;
         }
-
-        /// <summary>
-        /// Set BlueStacks Window Position
-        /// </summary>
+        
         public static bool SetPosition(int x, int y)
         {
-            Logger.Info("Set bluestacks position to {0},{1}", x, y);
+            Logger.Info("Settings position to {0},{1}", x, y);
             return AutoIt3Wrapper.WinMove(Process.MainWindowTitle, "", x, y) == 1;
         }
-
-        /// <summary>
-        ///  Template Matching Using Accord.NET on BlueStacks
-        /// </summary>
-        public static List<Point> TemplateMatch(Bitmap bitmap, float Similarity = 1.00f) // With This Method You Can Find Image Inside BlueStacks
+        
+        public static List<Point> TemplateMatch(Bitmap bitmap, float Similarity = 0.99f) 
         {
+            Bitmap BigImage = ImageUtils.ConvertPixelFormat(bitmap, PixelFormat.Format24bppRgb);
 
-            /*
-             * We Use Accord.NET instead AForge.Net because it's new version of aforge
-             * This Code's Is From a Sample, But Im Do Some Fix's
-             */
-
-            Bitmap BigImage = ClashSharpBot.Base.ImageUtils.ConvertPixelFormat(bitmap, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+            // Lock image bytes (Speed up)
+            BitmapData data = BigImage.LockBits(new Rectangle(0, 0, BigImage.Width, BigImage.Height), ImageLockMode.ReadOnly, BigImage.PixelFormat);
 
             // create template matching algorithm's instance
             Accord.Imaging.ExhaustiveTemplateMatching tm = new Accord.Imaging.ExhaustiveTemplateMatching(Similarity);
+
             // find all matchings with specified above similarity
-
             Accord.Imaging.TemplateMatch[] matchings = tm.ProcessImage(BigImage, GetBitmap());
-            // highlight found matchings
 
-            // Load Bitmap Into Memory (Speed UP)
-            BitmapData data = BigImage.LockBits(new Rectangle(0, 0, BigImage.Width, BigImage.Height), ImageLockMode.ReadOnly, BigImage.PixelFormat);
+            List<Point> Result = matchings.ToList().Select(s => s.Rectangle.Location).ToList();
 
-            List<Point> Result = new List<Point>();
-
-            foreach (Accord.Imaging.TemplateMatch m in matchings)
-            {
-                Result.Add(new System.Drawing.Point(m.Rectangle.X, m.Rectangle.Y));
-            }
-
-            // Unload Bitmap From Memory
+            // Unlock image bytes
             BigImage.UnlockBits(data);
 
             return Result;
         }
 
-        /// <summary>
-        /// Check Bitmap Exist on BlueStacks Screen
-        /// </summary>
-        /// <param name="bitmap"></param>
-        /// <returns></returns>
         public static bool BitmapExist(Bitmap bitmap, float Similarity = 1.00f)
         {
-            return TemplateMatch(bitmap, Similarity).Count <= 1;
+            return TemplateMatch(bitmap, Similarity).Count > 0;
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
 
-namespace ClashSharpBot.Base
+namespace ClashSharpBot
 {
     class ImageUtils
     {

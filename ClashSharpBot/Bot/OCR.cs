@@ -24,14 +24,17 @@ namespace ClashSharpBot.Bot
         static OCR()
         {
             Logger.Info("Loading Engine...");
-            OCREngine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default); ;
-
-            OCREngine.DefaultPageSegMode = PageSegMode.SingleWord;
+            OCREngine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default)
+            {
+                DefaultPageSegMode = PageSegMode.SingleWord
+            };
         }
 
         public static string ReadText(Rectangle rect)
         {
-            Logger.Debug("Reading text at {0}", rect);
+            Logger.Debug("Reading {0}", rect);
+
+            // TODO : Make image black and white 
 
             Bitmap image = BlueStacks.GetBitmap().Clone(rect, PixelFormat.Format32bppArgb);
 
@@ -40,7 +43,7 @@ namespace ClashSharpBot.Bot
 
         public static int ReadNumber(Rectangle rect)
         {
-            return Base.BasicMath.CleanStringOfNonDigits(ReadText(rect));
+            return BasicMath.CleanStringOfNonDigits(ReadText(rect));
         }
     }
 }

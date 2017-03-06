@@ -10,14 +10,14 @@ namespace ClashSharpBot.Bot.Logic
     {
         public int count;
         public TroopType Type;
-        public Button Button;
+        public ButtonPoint Button;
 
         /// <summary>
         /// Create New Instance of Troop
         /// </summary>
         /// <param name="type"></param>
         /// <param name="btn"></param>
-        public Troop(TroopType type, Button btn)
+        public Troop(TroopType type, ButtonPoint btn)
         {
             this.Type = type;
             this.Button = btn;

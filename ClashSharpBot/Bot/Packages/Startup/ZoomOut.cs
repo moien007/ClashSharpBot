@@ -19,7 +19,7 @@ namespace ClashSharpBot.Bot.Packages.Startup
     {
         public static void Execute()
         {
-            while(!ColorPoints.Village_ZoomOut.Exist)
+            while(!ColorPoints.Village_ZoomOut.Present)
             {
                 // Send Key
                 BlueStacks.Send("{DOWN}");

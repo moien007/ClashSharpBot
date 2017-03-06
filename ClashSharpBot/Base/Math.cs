@@ -7,7 +7,7 @@
 
 using System;
 
-namespace ClashSharpBot.Base
+namespace ClashSharpBot
 {
     class BasicMath
     {

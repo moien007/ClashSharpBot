@@ -87,14 +87,15 @@
     <Compile Include="Base\Imaging.cs" />
     <Compile Include="Base\Log.cs" />
     <Compile Include="Base\Math.cs" />
-    <Compile Include="Base\EasyPoint.cs" />
+    <Compile Include="Base\PointUtils.cs" />
     <Compile Include="Bot\AttackStrategy\Barch.cs" />
     <Compile Include="Bot\AttackStrategy\IAttackStrategy.cs" />
     <Compile Include="Bot\BlueStacks.cs" />
     <Compile Include="Bot\BotThread.cs" />
     <Compile Include="Bot\Logic\ColorPoint.cs" />
     <Compile Include="Bot\Logic\Barracks.cs" />
-    <Compile Include="Bot\Logic\Button.cs" />
+    <Compile Include="Bot\Logic\ButtonPoint.cs" />
+    <Compile Include="Bot\Logic\ReadPoint.cs" />
     <Compile Include="Bot\Logic\Troop.cs" />
     <Compile Include="Bot\Logic\Dialog.cs" />
     <Compile Include="Bot\OCR.cs" />
@@ -116,7 +117,8 @@
     <Compile Include="Bot\Packages\TrainArmy\GetTrainTimes.cs" />
     <Compile Include="Bot\Packages\TrainArmy\TrainTroops.cs" />
     <Compile Include="Bot\Buttons.cs" />
-    <Compile Include="Base\TextBoxWriter.cs" />
+    <Compile Include="Base\ControlWriter.cs" />
+    <Compile Include="Bot\ReadPoints.cs" />
     <Compile Include="Bot\ResourceReader.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Program.cs" />

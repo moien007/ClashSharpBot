@@ -11,23 +11,27 @@ using Microsoft.Win32;
 
 internal class Win32
 {
-    [DllImport("user32.dll", SetLastError = true)]
+    private const string USER32 = "user32.dll";
+    private const string KERNEL32 = "kernel32.dll";
+    private const bool SetLastError = true;
+
+    [DllImport(USER32, SetLastError = SetLastError)]
     public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport(USER32, SetLastError = SetLastError)]
     public static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string className, string lpszWindow);
 
-    [DllImport("user32.dll")]
+    [DllImport(USER32, SetLastError = SetLastError)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool GetWindowRect(HandleRef hWnd, out RECT lpRect);
 
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport(USER32, SetLastError = SetLastError)]
     public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
-    [DllImport("user32.dll")]
+    [DllImport(USER32, SetLastError = SetLastError)]
     public static extern IntPtr GetForegroundWindow();
 
-    [DllImport("user32.dll")]
+    [DllImport(USER32, SetLastError = SetLastError)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool SetForegroundWindow(IntPtr hWnd);
 

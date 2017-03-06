@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace ClashSharpBot.Bot.Logic
 {
-    public class Button
+    public class ButtonPoint
     {
         public Rectangle Rect
         {
@@ -29,7 +29,7 @@ namespace ClashSharpBot.Bot.Logic
         /// <param name="y"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public Button(Rectangle rect)
+        public ButtonPoint(Rectangle rect)
         {
             Rect = rect;
             ButtonImage = null;
@@ -42,7 +42,7 @@ namespace ClashSharpBot.Bot.Logic
         /// <param name="y"></param>
         /// <param name="width"></param>
         /// <param name="height"></param>
-        public Button(int x, int y, int width, int height)
+        public ButtonPoint(int x, int y, int width, int height)
         {
             Rect = new Rectangle(x, y, width, height);
             ButtonImage = null;
@@ -52,7 +52,7 @@ namespace ClashSharpBot.Bot.Logic
         /// Create new Instance of Button By Image
         /// </summary>
         /// <param name="image"></param>
-        public Button(Bitmap image)
+        public ButtonPoint(Bitmap image)
         {
             ButtonImage = image;
             Rect = Rectangle.Empty;

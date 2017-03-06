@@ -11,6 +11,8 @@ using System.Drawing;
 
 using ClashSharpBot.Bot.Logic;
 
+// TODO : Typo Fix
+
 namespace ClashSharpBot.Bot
 {
     class ColorPoints
@@ -22,6 +24,11 @@ namespace ClashSharpBot.Bot
 
         // The Pixel Exist When User Have Dark Elixir (A Pixel of Dark Elixir Picture on The Top Left)
         public static ColorPoint Village_Resource_DarkElixir = new ColorPoint(Color.Empty, Point.Empty);
+
+        public static ColorPoint Village_Resource_Gold = new ColorPoint(Color.Empty, Point.Empty);
+        public static ColorPoint Village_Resource_Elixir = new ColorPoint(Color.Empty, Point.Empty);
+        public static ColorPoint Village_Resource_Gem = new ColorPoint(Color.Empty, Point.Empty);
+
 
         // The Pixel Exist When User Earn Achivment (Red Color on Achivment Button)
         public static ColorPoint Village_Achivment_Exist = new ColorPoint(Color.Empty, Point.Empty);
